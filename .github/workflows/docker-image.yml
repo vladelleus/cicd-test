@@ -13,15 +13,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
+      
+    - name: Set date and time environment variable
+      run: echo ::set-env name=IMAGE_TAG::$(date +'%Y%m%d-%H%M%S')
+      
     - name: Build Docker image
       uses: docker/build-push-action@v2
       with:
         context: .
         push: false
-        tags: hello:${{ github.sha }}
+        tags: hello:${{ env.IMAGE_TAG }}
 
     - name: Run tests
-      uses: docker://hello:${{ github.sha }}
-      with:
-        entrypoint: python -m pytest
+      run: docker run hello:${{ env.IMAGE_TAG }} pytest
