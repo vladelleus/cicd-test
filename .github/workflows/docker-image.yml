@@ -27,4 +27,4 @@ jobs:
       run: |
         docker run --rm -d -p 8000:8000 myapp:${{ github.sha }} &
         sleep 10 &
-        curl http://127.0.0.1:8000
+        pytest
