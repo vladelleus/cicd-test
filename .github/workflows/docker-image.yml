@@ -5,9 +5,6 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
-env:
-  # Setting an environment variable with the value of a configuration variable
-  env_var: ${{ vars.ENV_CONTEXT_VAR }}
   
 jobs:
   build_and_test:
@@ -22,9 +19,9 @@ jobs:
       with:
         context: .
         push: false
-        tags: hello:${{ vars.GITHUB_SHA }}
+        tags: hello:${{ github.sha }}
 
     - name: Run tests
-      uses: docker://hello:${{ vars.GITHUB_SHA }}
+      uses: docker://hello:${{ github.sha }}
       with:
         entrypoint: python -m pytest
