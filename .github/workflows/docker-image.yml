@@ -23,7 +23,7 @@ jobs:
 
     - name: Build Docker image for testing
       run: |
-        docker build -t myapp:test-${{ github.sha }}
+        docker build -t myapp:test-${{ github.sha }} -f $(pwd)/Dockerfiletest .
 
     - name: Run tests
       run: |
