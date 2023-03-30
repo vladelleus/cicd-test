@@ -23,5 +23,5 @@ jobs:
 
     - name: Run tests
       run: |
-        docker run --rm -d -p 8000:8000 myapp:${{ github.sha }}
+        docker run --rm -d -p 8000:8000 myapp:${{ github.sha }} &
         docker exec -it $(docker ps -q) sh -c "pytest"
