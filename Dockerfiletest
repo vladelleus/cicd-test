@@ -1,0 +1,16 @@
+FROM python:3.9-slim-bullseye
+
+# Copy test files into the container
+WORKDIR /var/tests
+
+COPY app.py app.py
+
+COPY requirements.txt requirements.txt
+
+COPY test_app.py test_app.py
+
+# Install dependencies
+RUN pip install pytest -r requirements.txt
+
+# Run pytest when the container starts
+CMD ["sh", "-c", "python3 /var/tests/app.py & pytest"]
