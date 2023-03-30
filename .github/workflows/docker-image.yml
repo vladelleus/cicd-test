@@ -68,5 +68,5 @@ jobs:
       - name: Run deployment script on remote host
         run: |
           scp -i deploy-key -o StrictHostKeyChecking=no ./deploy.sh ec2-user@${{ env.AWS_INSTANCE_IP }}:/home/ec2-user/
-          ssh -i deploy-key -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} '/home/ec2-user/deploy.sh ${{ env.DOCKER_USERNAME }}/myapp:latest'
           ssh -i deploy-key -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} 'chmod +x /home/ec2-user/deploy.sh'
+          ssh -i deploy-key -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} '/home/ec2-user/deploy.sh ${{ env.DOCKER_USERNAME }}/myapp:latest'
