@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build Test Deploy
 
 on:
   push:
@@ -6,12 +6,12 @@ on:
   pull_request:
     branches: ["main"]
 env:
-  DOCKER_USERNAME: ${{ secrets.docker_username }}
-  DOCKER_PASSWORD: ${{ secrets.docker_passwd }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWRD }}
   AWS_REGION: us-east-1
-  AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_access_key }}
-  AWS_INSTANCE_IP: ${{ secrets.instance_ip }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_INSTANCE_IP: ${{ secrets.INSTANCE_IP }}
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
@@ -30,6 +30,7 @@ jobs:
           docker container inspect $(docker ps -lq) --format='{{.State.ExitCode}}'
 
   deploy:
+    needs: build_and_test
     runs-on: ubuntu-latest
 
     steps:
