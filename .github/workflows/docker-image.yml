@@ -28,4 +28,4 @@ jobs:
     - name: Run tests
       run: |
         docker run -d myapp:test-${{ github.sha }}
-        docker logs $(docker ps -a)
+        docker logs $(docker ps -lq)
