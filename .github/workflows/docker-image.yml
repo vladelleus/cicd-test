@@ -13,7 +13,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
+      
+    - name: Installing dependecies
+      run: pip install -r requirements.txt
+      
     - name: Build Docker image
       uses: docker/build-push-action@v2
       with:
@@ -23,5 +26,5 @@ jobs:
 
     - name: Run tests
       run: |
-        docker run --rm -d -p 8000:8000 myapp:${{ github.sha }} &
+        docker run -d -p 8000:8000 myapp:${{ github.sha }} &
         docker exec -it $(docker ps -q) /bin/sh -c "pytest"
