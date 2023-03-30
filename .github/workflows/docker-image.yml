@@ -59,12 +59,12 @@ jobs:
         run: |
           eval "$(ssh-agent -s)"
           ssh-add <(echo "${{ secrets.SSH_PRIVATE_KEY }}")
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} 'sudo yum update -y && sudo yum install -y docker git'
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} 'sudo systemctl enable docker && sudo systemctl start docker'
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} 'sudo usermod -aG docker ec2-user'
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} 'sudo yum update -y && sudo yum install -y docker git'
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} 'sudo systemctl enable docker && sudo systemctl start docker'
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} 'sudo usermod -aG docker ec2-user'
 
       - name: Run deployment script on remote host
         run: |
-          scp -i deploy-key -o StrictHostKeyChecking=no ./deploy.sh ec2-user@${{ env.AWS_INSTANCE_IP }}:/home/ec2-user/
-          ssh -i deploy-key -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} 'chmod +x /home/ec2-user/deploy.sh'
-          ssh -i deploy-key -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} '/home/ec2-user/deploy.sh ${{ secrets.REPO_NAME }}/myapp:latest'
+          scp -i deploy-key -o StrictHostKeyChecking=no ./deploy.sh ec2-user@${{ secrets.INSTANCE_IP }}:/home/ec2-user/
+          ssh -i deploy-key -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} 'chmod +x /home/ec2-user/deploy.sh'
+          ssh -i deploy-key -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} '/home/ec2-user/deploy.sh ${{ secrets.REPO_NAME }}/myapp:latest'
