@@ -27,5 +27,5 @@ jobs:
 
     - name: Run tests
       run: |
-        docker run -d myapp:test-${{ github.sha }}
-        docker logs $(docker ps -lq)
+        docker run -d myapp:test-${{ github.sha }} > container_logs && docker cp $(docker ps -lq):/container_logs .
+        cat container_logs
