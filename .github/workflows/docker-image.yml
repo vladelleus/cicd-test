@@ -5,27 +5,55 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
-
+env:
+  DOCKER_USERNAME: ${{ secrets.docker_username }}
+  DOCKER_PASSWORD: ${{ secrets.docker_passwd }}
+  AWS_REGION: us-east-1
+  AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_access_key }}
+  AWS_INSTANCE_IP: ${{ secrets.instance_ip }}
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      
-    - name: Build Docker image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: false
-        tags: myapp:${{ github.sha }}
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Build Docker image for testing
-      run: |
-        docker build -t myapp:test-${{ github.sha }} -f $(pwd)/Dockerfiletest .
+      - name: Build Docker image for testing
+        run: |
+          docker build -t myapp:test-${{ github.sha }} -f $(pwd)/Dockerfiletest .
 
-    - name: Run tests
-      run: |
-        docker run -d myapp:test-${{ github.sha }}
-        docker container inspect $(docker ps -lq) --format='{{.State.ExitCode}}'
+      - name: Run tests
+        run: |
+          docker run -d myapp:test-${{ github.sha }}
+          docker container inspect $(docker ps -lq) --format='{{.State.ExitCode}}'
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ env.DOCKER_USERNAME }}/myapp:latest
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+      - name: Install dependencies on remote host
+        run: |
+          eval "$(ssh-agent -s)"
+          ssh-add <(echo "${{ secrets.SSH_PRIVATE_KEY }}")
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} 'sudo yum update -y && sudo yum install -y docker git'
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} 'sudo systemctl enable docker && sudo systemctl start docker'
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} 'sudo usermod -aG docker ec2-user'
+
+      - name: Run deployment script on remote host
+        run: |
+          scp -i deploy-key -o StrictHostKeyChecking=no ./deploy.sh ec2-user@${{ env.AWS_INSTANCE_IP }}:/home/ec2-user/
+          ssh -i deploy-key -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} '/home/ec2-user/deploy.sh ${{ env.DOCKER_USERNAME }}/myapp:latest'
+          ssh -i deploy-key -o StrictHostKeyChecking=no ec2-user@${{ env.AWS_INSTANCE_IP }} 'chmod +x /home/ec2-user/deploy.sh'
