@@ -65,6 +65,8 @@ jobs:
 
       - name: Run deployment script on remote host
         run: |
+          ls -la
+          ls -la ~/.ssh/
           scp -o StrictHostKeyChecking=no ./deploy.sh ec2-user@${{ secrets.INSTANCE_IP }}:/home/ec2-user/
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} 'chmod +x /home/ec2-user/deploy.sh'
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} '/home/ec2-user/deploy.sh ${{ secrets.REPO_NAME }}/myapp:latest'
