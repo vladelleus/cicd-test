@@ -8,21 +8,21 @@ on:
 env:
   AWS_REGION: us-east-1
 jobs:
-  #  build_and_test:
-  #    runs-on: ubuntu-latest
+  build_and_test:
+    runs-on: ubuntu-latest
 
-  #    steps:
-  #      - name: Checkout code
-  #        uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-  #      - name: Build Docker image for testing
-  #        run: |
-  #          docker build -t myapp:test-${{ github.sha }} -f $(pwd)/Dockerfiletest .
-  #
-  #      - name: Run tests
-  #        run: |
-  #          docker run -d myapp:test-${{ github.sha }}
-  #          docker container inspect $(docker ps -lq) --format='{{.State.ExitCode}}'
+      - name: Build Docker image for testing
+        run: |
+          docker build -t myapp:test-${{ github.sha }} -f $(pwd)/Dockerfiletest .
+
+      - name: Run tests
+        run: |
+          docker run -d myapp:test-${{ github.sha }}
+          docker container inspect $(docker ps -lq) --format='{{.State.ExitCode}}'
 
   deploy:
     needs: build_and_test
