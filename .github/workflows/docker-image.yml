@@ -64,11 +64,9 @@ jobs:
         ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} 'sudo usermod -aG docker ec2-user'
 
     - name: Run deployment script on remote host
-      env:
-        IMAGE_TAG: latest
       run: |
         eval "$(ssh-agent -s)"
         ssh-add <(echo "${{ secrets.SSH_PRIVATE_KEY }}")
         scp -o StrictHostKeyChecking=no ./deploy.sh ec2-user@${{ secrets.INSTANCE_IP }}:/home/ec2-user/
         ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} 'chmod +x /home/ec2-user/deploy.sh'
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} '/home/ec2-user/deploy.sh ${{ steps.build-image.outputs.image }}:${{ env.IMAGE_TAG }} ${{ secrets.AWS_ACCESS_KEY }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ env.AWS_REGION }} ${{ secrets.ACCOUNT_ID }}'
+        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.INSTANCE_IP }} '/home/ec2-user/deploy.sh ${{ steps.build-image.outputs.image }} ${{ secrets.AWS_ACCESS_KEY }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ env.AWS_REGION }} ${{ secrets.ACCOUNT_ID }}'
